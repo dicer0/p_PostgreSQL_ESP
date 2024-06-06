@@ -247,3 +247,79 @@ WHERE   id IN (
   FROM    ejercicios.alumnos
   WHERE   tutor_id = 30
 );
+
+
+
+
+
+/*5.	Realiza una consulta SQL que utilice los comandos EXTRACT y DATE_PART() para extraer partes de una columna perteneciente 
+a la tabla alumnos que contenga datos tipo fecha (date), hora (timestamp) o intervalo (interval). Para ello en pgAdmin se 
+selecciona la opción de: Tools → Query Tool.
+  - SELECT: Comando que indica las columnas de datos que se quiere extraer y mostrar.
+  - EXTRACT: Este comando se utiliza para extraer ciertas partes de una columna tipo fecha, hora (timestamp) o intervalo; como 
+    su año, mes, día, hora, minuto, segundo, etc. a través de la siguiente sintaxis, donde: 
+      - field: Es el componente específico que se quiere extraer, que puede adoptar los valores: YEAR, MONTH, DAY, HOUR, 
+        MINUTE, SECOND, QUARTER, DOW (Day Of Week o día de la semana), DOY (Day Of Year o día del año), etc.
+      - source: Indica la columna de tipo date, timestamp o interval del que se quiere extraer un componente.
+          EXTRACT(field     FROM    source)
+  - DATE_PART(): Este comando se utiliza para extraer ciertas partes de una columna tipo fecha, hora (timestamp) o intervalo; 
+    como su año, mes, día, hora, minuto, segundo, etc. a través de la siguiente sintaxis que es muy parecida a la de EXTRACT: 
+      - field: Es un string que especifica el componente de la fecha u hora que se desea extraer, el cual puede adoptar los 
+        valores de: year, month, day, hour, minute, second, quarter, dow (día de la semana), doy (día del año), etc.
+      - source: Indica la columna de tipo date, timestamp o interval del que se quiere extraer un componente.
+          DATE_PART(field,          source)
+  - AS: Es una instrucción opcional que se puede utilizar en conjunto con el comando SELECT, FROM o JOIN, la cual sirve para 
+    cambiar el nombre de la columna de datos extraída y asignarle un alias o nombre de variable, cambiando solo la forma en 
+    la que se representan los datos extraídos, no su nombre en la base de datos.
+  - FROM: Comando que indica la tabla de donde se tomarán los datos.
+  - WHERE: Comando para indicar exactamente a cuáles filas de la tabla nos estamos refiriendo, filtrando así la consulta a 
+    través de cierta condición matemática (=, >, <, etc.), ya que la extracción se puede realizar de una o varias filas, para 
+    ello se utiliza el comando WHERE acompañado del valor de algún atributo.
+Se pueden extraer varios componentes de las columnas con datos tipo fecha (date), hora (timestamp) o intervalo (interval) si 
+se utilizan varias veces los comandos EXTRACT y DATE_PART() y se separan por comas.*/
+--Obtención de componentes de fecha u hora con el comando EXTRACT(field     FROM    source):
+SELECT  EXTRACT (YEAR FROM fecha_incorporacion) AS anio_incorporacion,
+		    EXTRACT (HOUR FROM fecha_incorporacion) AS hora_incorporacion,
+		    EXTRACT (MINUTE FROM fecha_incorporacion) AS minuto_incorporacion
+FROM	  ejercicios.alumnos;
+--Obtención de componentes de fecha u hora con el comando DATE_PART(field,  source):
+SELECT  DATE_PART ('year', fecha_incorporacion) AS anio_incorporacion,
+		    DATE_PART ('month', fecha_incorporacion) AS mes_incorporacion,
+		    DATE_PART ('day', fecha_incorporacion) AS dia_incorporacion
+FROM	  ejercicios.alumnos;
+/*Filtrado de filas por medio de una subconsulta que utiliza los comandos EXTRACT o DATE_PART():
+Consultas Anidadas: Se denotan por encontrarse entre paréntesis después de un comando SQL y casi siempre forzosamente se les 
+debe asignar un alias a través del comando AS, pero hay que tener en cuenta que lo que retorne esta operación interna, será 
+utilizado por el comando exterior, por lo que las Nested Queries no están limitadas a un uso, sino a una infinidad, dependiendo 
+del comando exterior al que se aplique y la acción interna que sea descrita entre sus paréntesis.
+En este caso como se aplica al método WHERE, se ejecutará 1 vez para cada fila de la tabla indicada en el comando FROM.*/
+--Filtrado de filas a través de componentes de fecha u hora con el comando EXTRACT(field     FROM    source):
+SELECT  *
+FROM	  ejercicios.alumnos
+WHERE   (
+  EXTRACT (YEAR FROM fecha_incorporacion)
+) = 2019;
+--Filtrado doble de filas a través de componentes de fecha u hora con el comando DATE_PART(field,  source):
+SELECT  *
+FROM	  ejercicios.alumnos
+WHERE (
+  DATE_PART ('year', fecha_incorporacion)
+) = 2019
+AND (
+	DATE_PART ('month', fecha_incorporacion)
+) = 05;
+--Filtrado de filas a través de componentes de fecha u hora subconsultas:
+SELECT  *
+FROM (
+  SELECT  *, DATE_PART ('year', fecha_incorporacion) AS anio_incorporacion
+  FROM	  ejercicios.alumnos
+) AS  query_alumnos_conAnio_anidado
+WHERE anio_incorporacion = 2019;
+
+
+
+
+
+/*6.	Realiza una consulta SQL que utilice los comandos EXTRACT y DATE_PART() para extraer partes de una columna perteneciente 
+a la tabla alumnos que contenga datos tipo fecha (date), hora (timestamp) o intervalo (interval). Para ello en pgAdmin se 
+selecciona la opción de: Tools → Query Tool.
