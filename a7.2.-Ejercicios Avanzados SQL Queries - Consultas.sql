@@ -21,17 +21,17 @@ FETCH FIRST 1 ROWS ONLY;
 SELECT 	*
 FROM	  ejercicios.alumnos
 LIMIT   1;
-/*Consultas Anidadas: Se denotan por encontrarse entre paréntesis después de un comando SQL y forzosamente se les debe asignar 
-un alias a través del comando AS, pero hay que tener en cuenta que lo que retorne esta operación interna, será utilizado por 
-el comando exterior, por lo que las Nested Queries no están limitadas a un uso, sino a una infinidad, dependiendo del comando 
-exterior al que se aplique y la acción interna que sea descrita entre sus paréntesis.
+/*Consultas Anidadas: Se denotan por encontrarse entre paréntesis después de un comando SQL y casi siempre forzosamente se les 
+debe asignar un alias a través del comando AS, pero hay que tener en cuenta que lo que retorne esta operación interna, será 
+utilizado por el comando exterior, por lo que las Nested Queries no están limitadas a un uso, sino a una infinidad, dependiendo 
+del comando exterior al que se aplique y la acción interna que sea descrita entre sus paréntesis.
 En este caso como se aplica al método FROM, solo se ejecutará una vez y sirve para crear una nueva tabla con un id agregado.
   - SELECT: Comando que indica las columnas de datos que se quiere extraer y mostrar, si se quiere mostrar todas, se utiliza 
     un asterisco *.
   - FROM: Comando que indica la tabla de donde se tomarán los datos.
   - ROW_NUMBER(): Comando de tipo Window Function que asigna un número único y secuencial a cada fila dentro de una consulta, 
     comenzando desde 1 y siempre estando acompañado de la función OVER().
-      - OVER(): Comando que define el conjunto de filas sobre las cuales opera el comando ROW_NUMBER(). Si la función no 
+      - OVER(): Comando que define las columnas de la tabla sobre las que opera el comando ROW_NUMBER(). Si la función no 
         recibe ningún parámetro, la Window Function se aplica sobre todas las filas sin particionar (clasificar) ni ordenar 
         los datos.
   - AS: Es una instrucción opcional que se puede utilizar en conjunto con el comando SELECT, FROM o JOIN, la cual sirve para 
@@ -44,8 +44,7 @@ En este caso como se aplica al método FROM, solo se ejecutará una vez y sirve 
     ello se utiliza el comando WHERE acompañado del valor de algún atributo.
 ROW_NUMBER(), RANK(), DENSE_RANK(), etc. son comandos de tipo Window Function (Función de Ventana) que nos permiten ordenar 
 la forma en la que se muestran los datos o realizar cálculos de posición, promedio, suma, etc. sobre un grupo de filas 
-relacionadas, pero sin cambiar la forma en que se muestran los datos, agregando información extra a cada fila de la tabla 
-para poder realizarlos.*/
+relacionadas, agregando información extra a cada fila de la tabla para poder realizarlos.*/
 SELECT 	*
 FROM	(
 	SELECT ROW_NUMBER() OVER() AS row_id, *
@@ -55,13 +54,15 @@ WHERE row_id = 1;
 
 
 
+
+
 /*2.	Realiza una consulta SQL que obtenga el registro o fila del atributo colegiatura perteneciente a la tabla alumnos que 
 tenga el segundo valor más alto. Para ello todos los siguientes códigos son equivalentes. Para ello todos los siguientes 
 códigos son equivalentes y en pgAdmin se ejecutan al seleccionar la opción de: Tools → Query Tool.*/
-/*Consultas Anidadas: Se denotan por encontrarse entre paréntesis después de un comando SQL y forzosamente se les debe asignar 
-un alias a través del comando AS, pero hay que tener en cuenta que lo que retorne esta operación interna, será utilizado por 
-el comando exterior, por lo que las Nested Queries no están limitadas a un uso, sino a una infinidad, dependiendo del comando 
-exterior al que se aplique y la acción interna que sea descrita entre sus paréntesis.
+/*Consultas Anidadas: Se denotan por encontrarse entre paréntesis después de un comando SQL y casi siempre forzosamente se les 
+debe asignar un alias a través del comando AS, pero hay que tener en cuenta que lo que retorne esta operación interna, será 
+utilizado por el comando exterior, por lo que las Nested Queries no están limitadas a un uso, sino a una infinidad, dependiendo 
+del comando exterior al que se aplique y la acción interna que sea descrita entre sus paréntesis.
 En este caso como se aplica al método WHERE, se ejecutará 1 vez para cada fila de la tabla indicada en el comando FROM.
   - SELECT: Comando que indica las columnas de datos que se quiere extraer y mostrar.
   - DISTINCT: Este comando se usa para eliminar las filas duplicadas en los resultados obtenidos de una consulta, mostrando 
@@ -96,10 +97,10 @@ SELECT 	DISTINCT colegiatura
 FROM 	  ejercicios.alumnos
 ORDER BY colegiatura DESC
 LIMIT 1 OFFSET 1;
-/*Consultas Anidadas: Se denotan por encontrarse entre paréntesis después de un comando SQL y forzosamente se les debe asignar 
-un alias a través del comando AS, pero hay que tener en cuenta que lo que retorne esta operación interna, será utilizado por 
-el comando exterior, por lo que las Nested Queries no están limitadas a un uso, sino a una infinidad, dependiendo del comando 
-exterior al que se aplique y la acción interna que sea descrita entre sus paréntesis.
+/*Consultas Anidadas: Se denotan por encontrarse entre paréntesis después de un comando SQL y casi siempre forzosamente se les 
+debe asignar un alias a través del comando AS, pero hay que tener en cuenta que lo que retorne esta operación interna, será 
+utilizado por el comando exterior, por lo que las Nested Queries no están limitadas a un uso, sino a una infinidad, dependiendo 
+del comando exterior al que se aplique y la acción interna que sea descrita entre sus paréntesis.
 En este caso como se aplica al método INNER JOIN, se ejecutará 1 vez para cada fila de la tabla indicada en el comando FROM.
   - SELECT: Comando que indica las columnas de datos que se quiere extraer y mostrar.
   - DISTINCT: Este comando se usa para eliminar las filas duplicadas en los resultados obtenidos de una consulta, mostrando 
@@ -132,10 +133,10 @@ INNER JOIN (
 	LIMIT 1 OFFSET 1
 ) AS segunda_mayor_colegiatura
 ON datos_alumnos.colegiatura = segunda_mayor_colegiatura.colegiatura;
-/*Consultas Anidadas: Se denotan por encontrarse entre paréntesis después de un comando SQL y forzosamente se les debe asignar 
-un alias a través del comando AS, pero hay que tener en cuenta que lo que retorne esta operación interna, será utilizado por 
-el comando exterior, por lo que las Nested Queries no están limitadas a un uso, sino a una infinidad, dependiendo del comando 
-exterior al que se aplique y la acción interna que sea descrita entre sus paréntesis.
+/*Consultas Anidadas: Se denotan por encontrarse entre paréntesis después de un comando SQL y casi siempre forzosamente se les 
+debe asignar un alias a través del comando AS, pero hay que tener en cuenta que lo que retorne esta operación interna, será 
+utilizado por el comando exterior, por lo que las Nested Queries no están limitadas a un uso, sino a una infinidad, dependiendo 
+del comando exterior al que se aplique y la acción interna que sea descrita entre sus paréntesis.
 En este caso como se aplica al método WHERE, se ejecutará 1 vez para cada fila de la tabla indicada en el comando FROM.
   - SELECT: Comando que indica las columnas de datos que se quiere extraer y mostrar.
   - DISTINCT: Este comando se usa para eliminar las filas duplicadas en los resultados obtenidos de una consulta, mostrando 
@@ -160,4 +161,89 @@ WHERE   colegiatura = (
 	FROM		  ejercicios.alumnos
 	ORDER BY	colegiatura DESC
 	LIMIT 1 OFFSET 1
+);
+
+
+
+
+
+/*3.	Realiza una consulta SQL que retorne solo la última mitad de las filas pertenecientes a la tabla alumnos. Para ello en 
+pgAdmin se selecciona la opción de: Tools → Query Tool.*/
+/*Consultas Anidadas: Se denotan por encontrarse entre paréntesis después de un comando SQL y casi siempre forzosamente se les 
+debe asignar un alias a través del comando AS, pero hay que tener en cuenta que lo que retorne esta operación interna, será 
+utilizado por el comando exterior, por lo que las Nested Queries no están limitadas a un uso, sino a una infinidad, dependiendo 
+del comando exterior al que se aplique y la acción interna que sea descrita entre sus paréntesis.
+En este caso como se aplica al método OFFSET, se ejecutará 1 vez e indicará cuántas filas se debe saltar la consulta para 
+obtener solo la segunda mitad de las filas pertenecientes a la tabla alumnos.
+  - SELECT: Comando que indica las columnas de datos que se quiere extraer y mostrar.
+  - ROW_NUMBER(): Comando de tipo Window Function que asigna un número único y secuencial a cada fila dentro de una consulta, 
+    comenzando desde 1 y siempre estando acompañado de la función OVER().
+      - OVER(): Comando que define las columnas de la tabla sobre las que opera el comando ROW_NUMBER(). Si la función no 
+        recibe ningún parámetro, la Window Function se aplica sobre todas las filas sin particionar (clasificar) ni ordenar 
+        los datos.
+  - AS: Es una instrucción opcional que se puede utilizar en conjunto con el comando SELECT, FROM o JOIN, la cual sirve para 
+    cambiar el nombre de la columna de datos extraída y asignarle un alias o nombre de variable, cambiando solo la forma en 
+    la que se representan los datos extraídos, no su nombre en la base de datos.
+    En este caso se utiliza para indicar el nombre de la nueva columna de conteo creada por el comando ROW_NUMBER() y luego 
+    se añade un asterisco * para extraer todos los demás datos de la tabla sin cambiar sus nombres de columna.
+  - FROM: Comando que indica la tabla de donde se tomarán los datos.
+  -	OFFSET: Este comando se suele utilizar en conjunto con la instrucción LIMIT, ya que indica cuántos datos nos tenemos que 
+    saltar o ignorar de arriba hacia abajo, para que desde ahí se empiece a recabar la información del Query.
+  - COUNT(): Método que cuando se utiliza, siempre se debe poner después del método SELECT; este recibe como parámetro un 
+    atributo de los datos pertenecientes a la tabla y retorna el número de filas de datos que pertenecen a dicha columna.
+ROW_NUMBER(), RANK(), DENSE_RANK(), etc. son comandos de tipo Window Function (Función de Ventana) que nos permiten ordenar 
+la forma en la que se muestran los datos o realizar cálculos de posición, promedio, suma, etc. sobre un grupo de filas 
+relacionadas, agregando información extra a cada fila de la tabla para poder realizarlos.*/
+SELECT ROW_NUMBER() OVER() AS row_id, *
+FROM    ejercicios.alumnos
+OFFSET (
+  SELECT  COUNT(*)/2
+  FROM    ejercicios.alumnos
+);
+
+
+
+
+
+/*4.	Realiza una consulta SQL que filtre las filas de información de la tabla alumnos obtenidas a través de varios valores 
+estáticos incluidos en un array. Para ello en pgAdmin se selecciona la opción de: Tools → Query Tool.*/
+/*Consultas Anidadas: Se denotan por encontrarse entre paréntesis después de un comando SQL y casi siempre forzosamente se les 
+debe asignar un alias a través del comando AS, pero hay que tener en cuenta que lo que retorne esta operación interna, será 
+utilizado por el comando exterior, por lo que las Nested Queries no están limitadas a un uso, sino a una infinidad, dependiendo 
+del comando exterior al que se aplique y la acción interna que sea descrita entre sus paréntesis.
+En este caso como se aplica al método FROM, solo se ejecutará una vez y sirve para crear una nueva tabla con un id agregado.
+  - SELECT: Comando que indica las columnas de datos que se quiere extraer y mostrar.
+  - FROM: Comando que indica la tabla de donde se tomarán los datos.
+  - ROW_NUMBER(): Comando de tipo Window Function que asigna un número único y secuencial a cada fila dentro de una consulta, 
+    comenzando desde 1 y siempre estando acompañado de la función OVER().
+      - OVER(): Comando que define las columnas de la tabla sobre las que opera el comando ROW_NUMBER(). Si la función no 
+        recibe ningún parámetro, la Window Function se aplica sobre todas las filas sin particionar (clasificar) ni ordenar 
+        los datos.
+  - AS: Es una instrucción opcional que se puede utilizar en conjunto con el comando SELECT, FROM o JOIN, la cual sirve para 
+    cambiar el nombre de la columna de datos extraída y asignarle un alias o nombre de variable, cambiando solo la forma en 
+    la que se representan los datos extraídos, no su nombre en la base de datos.
+    En este caso se utiliza para indicar el nombre de la nueva columna de conteo creada por el comando ROW_NUMBER() y luego 
+    se añade un asterisco * para extraer todos los demás datos de la tabla sin cambiar sus nombres de columna.
+  - WHERE: Comando para indicar exactamente a cuáles filas de la tabla nos estamos refiriendo, filtrando así la consulta a 
+    través de cierta condición matemática (=, >, <, etc.), ya que la extracción se puede realizar de una o varias filas, para 
+    ello se utiliza el comando WHERE acompañado del valor de algún atributo.
+      - IN: Si se quiere agregar un filtro en forma de Array estático, se utiliza la instrucción IN seguida de sus valores 
+        entre paréntesis (valorArray_1, …, valorArray_n) y con eso se podrán indicar varios valores de filtro específicos.
+        Si se quiere obtener sus valores opuestos, se usa la instrucción NOT IN.
+ROW_NUMBER(), RANK(), DENSE_RANK(), etc. son comandos de tipo Window Function (Función de Ventana) que nos permiten ordenar 
+la forma en la que se muestran los datos o realizar cálculos de posición, promedio, suma, etc. sobre un grupo de filas 
+relacionadas, agregando información extra a cada fila de la tabla para poder realizarlos.*/
+SELECT  *
+FROM (
+  SELECT  ROW_NUMBER() OVER() AS row_id, *
+  FROM    ejercicios.alumnos
+) AS query_anidado_alumnos
+WHERE row_id IN (1, 5, 10, 12, 15);
+/*De igual forma, los valores del Array se pueden obtener a través de una subconsulta, realizando la misma operación:*/
+SELECT  *
+FROM    ejercicios.alumnos
+WHERE   id IN (
+  SELECT  id, tutor_id
+  FROM    ejercicios.alumnos
+  WHERE   tutor_id = 30
 );
