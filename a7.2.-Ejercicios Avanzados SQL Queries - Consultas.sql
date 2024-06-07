@@ -373,8 +373,8 @@ HAVING num_filas > 1;
 debe asignar un alias a través del comando AS, pero hay que tener en cuenta que lo que retorne esta operación interna, será 
 utilizado por el comando exterior, por lo que las Nested Queries no están limitadas a un uso, sino a una infinidad, dependiendo 
 del comando exterior al que se aplique y la acción interna que sea descrita entre sus paréntesis.
-En este caso como se aplica al método FROM, solo se ejecutará una vez y sirve para crear una nueva tabla con un id agregado, que 
-a su vez particione los datos para excluir la columna id y así poder encontrar los duplicados.
+En este caso como se aplica al método FROM, solo se ejecutará una vez y sirve para crear una nueva tabla con un id agregado, 
+que a su vez particione los datos para excluir la columna id y así poder encontrar los duplicados.
   - SELECT: Comando que indica las columnas de datos que se quiere extraer y mostrar, si se quiere mostrar todas, se utiliza 
     un asterisco *.
   - FROM: Comando que indica la tabla de donde se tomarán los datos.
@@ -448,3 +448,71 @@ WHERE id IN (
   ) AS query_anidado_duplicados
   WHERE query_anidado_duplicados.filas_duplicadas > 1
 );
+
+
+
+
+
+/*7.	Realiza una consulta SQL que filtre las filas de información de la tabla alumnos obtenidas a través de varios valores 
+estáticos, pero estos no deben estar incluidos en un array, sino en un valor de tipo range. Para ello en pgAdmin se selecciona 
+la opción de: Tools → Query Tool.
+  - Recordemos que las consultas que obtienen filas de información de una tabla a través de varios valores estáticos incluidos 
+    en un array se ejecutan a través de los comandos WHERE e IN, pero esto se puede manejar también con tipos de dato Range, 
+    los cuales representan los siguientes intervalos de valores continuos:
+      - int4range: Representa un rango de enteros de 4 bytes (0 a 65,000).
+      - int8range: Representa un rango de enteros de 8 bytes (0 a 4 millones).
+      - numrange: Representa un rango de números decimales (1.5 a 10.5).
+      - tsrange: Representa un rango de fecha/hora sin zona horaria (timestamp).
+      - tstzrange: Rango de fecha/hora con zona horaria (timestamp with time zone).
+      - daterange: Representa un rango de fechas (date).
+Primero se obtendrán los rangos utilizando el comando WHERE/IN (Arrays), el comando AND y el comando BETWEEN/AND y luego se 
+analizará la alternativa de realizar la misma operación con tipos de dato Range.*/
+--Consulta con obtención de Intervalos por medio del comando WHERE/IN (Arrays):
+SELECT  *
+FROM    ejercicios.alumnos
+WHERE   tutor_id IN (1,2,3,4,5,6,7,8,9,10);
+--Consulta con obtención de Intervalos por medio del comando AND:
+SELECT  *
+FROM    ejercicios.alumnos
+WHERE   tutor_id >= 1
+        AND tutor_id <= 10;
+--Consulta con obtención de Intervalos por medio del comando BETWEEN/AND:
+SELECT  *
+FROM    ejercicios.alumnos
+WHERE   tutor_id BETWEEN 1 AND 10;
+/*OBTENCIÓN DE INTERVALOS CON TIPOS DE DATO RANGE:
+Cuando se utilicen tipos de dato range en consultas SQL, usualmente se acompañan de los siguientes operadores para realizar 
+acciones con ellos:
+  - @> (Contiene): Operación que verifica si un rango contiene otro conjunto de valores estáticos o un valor singular en 
+    específico, devolviendo un booleano True si existe el valor o False si no existe.
+  - * (Intersección): Usualmente este operador multiplica dos valores numéricos, pero cuando se aplica a tipos de dato range, 
+    obtiene su intersección y devuelve los datos donde esto ocurre.
+  - && (Intersección): Verifica si dos rangos, arrays, o conjuntos se superponen o interseccionan, devolviendo un booleano True 
+    si existe superposición o False si no existe.
+  - UPPER(): Convierte una cadena de texto a mayúsculas o devuelve el valor máximo de un tipo de dato range.
+  - LOWER(): Convierte una cadena de texto a minúsculas o devuelve el valor mínimo de un tipo de dato range.
+  - ISEMPTY(): Verifica si un tipo de dato range está vacío, devolviendo un booleano True si no existe ningún valor o False si 
+    existe alguno.
+Primero se realizarán ejemplos sencillos del uso de los tipos de datos range y luego se aplicarán a consultas.*/
+--Ejemplo de operación simple del operador @> (Contiene) con tipos de dato range:
+SELECT  int4range(10,20) @> 3;
+--Ejemplo de operación simple del operador * (Intersección) con tipos de dato range:
+SELECT  int8range(10,20) * int8range(15,20);
+--Ejemplo de operación simple del operador && (Intersección) con tipos de dato range:
+SELECT  numrange(11.1,22.2) && numrange(20.0,30.0);
+--Ejemplo de operación simple del operador UPPER() con tipos de dato range:
+SELECT  UPPER(numrange(12.8,30.5));
+--Ejemplo de operación simple del operador ISEMPTY() con tipos de dato range:
+SELECT  ISEMPTY(numrange(12.8,30.5));
+--Consulta con obtención de Intervalos por medio de tipos de dato range:
+SELECT  *
+FROM    ejercicios.alumnos
+WHERE   int4range(0,10) @> tutor_id;
+
+
+
+
+
+/*8.	Realiza una consulta SQL que filtre las filas de información de la tabla alumnos obtenidas a través de varios valores 
+estáticos, pero estos no deben estar incluidos en un array, sino en un valor de tipo range. Para ello en pgAdmin se selecciona 
+la opción de: Tools → Query Tool.
