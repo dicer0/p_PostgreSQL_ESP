@@ -459,9 +459,9 @@ la opción de: Tools → Query Tool.
   - Recordemos que las consultas que obtienen filas de información de una tabla a través de varios valores estáticos incluidos 
     en un array se ejecutan a través de los comandos WHERE e IN, pero esto se puede manejar también con tipos de dato Range, 
     los cuales representan los siguientes intervalos de valores continuos:
-      - int4range: Representa un rango de enteros de 4 bytes (0 a 65,000).
-      - int8range: Representa un rango de enteros de 8 bytes (0 a 4 millones).
-      - numrange: Representa un rango de números decimales (1.5 a 10.5).
+      - int4range: Representa un rango de enteros de 4 bytes (de 0 a 65,000).
+      - int8range: Representa un rango de enteros de 8 bytes (de 0 a 4 millones).
+      - numrange: Representa un rango de números enteros o decimales (de 1.5 a 10.5).
       - tsrange: Representa un rango de fecha/hora sin zona horaria (timestamp).
       - tstzrange: Rango de fecha/hora con zona horaria (timestamp with time zone).
       - daterange: Representa un rango de fechas (date).
@@ -486,7 +486,7 @@ acciones con ellos:
   - @> (Contiene): Operación que verifica si un rango contiene otro conjunto de valores estáticos o un valor singular en 
     específico, devolviendo un booleano True si existe el valor o False si no existe.
   - * (Intersección): Usualmente este operador multiplica dos valores numéricos, pero cuando se aplica a tipos de dato range, 
-    obtiene su intersección y devuelve los datos donde esto ocurre.
+    obtiene su intersección y devuelve el rango de donde esto ocurre.
   - && (Intersección): Verifica si dos rangos, arrays, o conjuntos se superponen o interseccionan, devolviendo un booleano True 
     si existe superposición o False si no existe.
   - UPPER(): Convierte una cadena de texto a mayúsculas o devuelve el valor máximo de un tipo de dato range.
@@ -497,7 +497,7 @@ Primero se realizarán ejemplos sencillos del uso de los tipos de datos range y 
 --Ejemplo de operación simple del operador @> (Contiene) con tipos de dato range:
 SELECT  int4range(10,20) @> 3;
 --Ejemplo de operación simple del operador * (Intersección) con tipos de dato range:
-SELECT  int8range(10,20) * int8range(15,20);
+SELECT  int8range(10,20) * int8range(15,22);
 --Ejemplo de operación simple del operador && (Intersección) con tipos de dato range:
 SELECT  numrange(11.1,22.2) && numrange(20.0,30.0);
 --Ejemplo de operación simple del operador UPPER() con tipos de dato range:
@@ -513,6 +513,88 @@ WHERE   int4range(0,10) @> tutor_id;
 
 
 
-/*8.	Realiza una consulta SQL que filtre las filas de información de la tabla alumnos obtenidas a través de varios valores 
-estáticos, pero estos no deben estar incluidos en un array, sino en un valor de tipo range. Para ello en pgAdmin se selecciona 
-la opción de: Tools → Query Tool.
+/*8.	Realiza una consulta SQL que encuentre el rango numérico de filas donde se intersectan las columnas tutor_id y carrera_id 
+pertenecientes a la tabla alumnos, obtenidas a través de valores tipo range. Para ello en pgAdmin se selecciona la opción de: 
+Tools → Query Tool.*/
+/*Consultas Anidadas: Se denotan por encontrarse entre paréntesis después de un comando SQL y casi siempre forzosamente se les 
+debe asignar un alias a través del comando AS, pero hay que tener en cuenta que lo que retorne esta operación interna, será 
+utilizado por el comando exterior, por lo que las Nested Queries no están limitadas a un uso, sino a una infinidad, dependiendo 
+del comando exterior al que se aplique y la acción interna que sea descrita entre sus paréntesis.
+En este caso como se aplica a un tipo de dato range, solo se ejecutará una vez y sirve para indicar el límite mínimo y máximo 
+de un rango numérico.
+  - SELECT: Comando que indica las columnas de datos que se quiere extraer y mostrar.
+  - numrange: Representa un rango de números enteros o decimales (de 1.5 a 10.5).
+  - MIN(): Devuelve el valor mínimo de la columna que reciba como parámetro.
+  - MAX(): Devuelve el valor máximo de la columna que reciba como parámetro.
+  - FROM: Comando que indica la tabla de donde se tomarán los datos.
+Cuando se utilicen tipos de dato range en consultas SQL, usualmente se acompañan de algún operador para realizar acciones con 
+ellos, en este caso solo se explicará el de intersección porque es el que sirve para la resolver el problema:
+  - * (Intersección): Usualmente este operador multiplica dos valores numéricos, pero cuando se aplica a tipos de dato range, 
+    obtiene su intersección y devuelve el rango de datos donde esto ocurre.
+  - Ejemplo de operación simple del operador * (Intersección) con tipos de dato range:
+      SELECT  int8range(10,20) * int8range(15,22); = [15,20)*/
+SELECT  numrange(
+	(SELECT MIN(tutor_id) FROM ejercicios.alumnos),
+	(SELECT MAX(tutor_id) FROM ejercicios.alumnos)
+) * numrange(
+	(SELECT MIN(carrera_id) FROM ejercicios.alumnos),
+	(SELECT MAX(carrera_id) FROM ejercicios.alumnos)
+);
+
+
+
+
+
+/*9.	Realiza una consulta SQL que obtenga y acomode sus filas a través de los valores máximos de 2 columnas con valores de 
+tipos diferentes carrera_id (tipo de dato numérico) y fecha_incorporacion (tipo de dato date) pertenecientes a la tabla 
+alumnos. Para ello en pgAdmin se selecciona la opción de: Tools → Query Tool.
+  - Para acomodar los resultados de una consulta en función de los valores mínimos o máximos de alguna de sus columnas, 
+    usualmente se utilizan los comandos GROUP BY y ORDER BY. Pero cuando no solamente se quiere agrupar sus resultados a 
+    través de los valores mínimos o máximos de una sola una columna, sino de varias, se debe además hacer uso de los comandos 
+    MAX() y MIN() donde se esté declarando el comando SELECT en el código SQL.
+Si no se utilizan los comandos MAX() o MIN() en conjunto con las funciones GROUP BY y ORDER BY, se obtendrá solamente el 
+máximo de toda la tabla y esto se asignará a cada fila de agrupaciones, pero no se obtendrá el máximo de cada agrupación.
+  - SELECT: Comando que indica las columnas de datos que se quiere extraer y mostrar.
+  - MIN(): Devuelve el valor mínimo de la columna que reciba como parámetro.
+  - MAX(): Devuelve el valor máximo de la columna que reciba como parámetro.
+  - FROM: Comando que indica la tabla de donde se tomarán los datos.
+  - GROUP BY: Esta sentencia agrupa las filas resultantes de una consulta según uno o más atributos especificados. Se utiliza 
+    junto los métodos COUNT(), SUM(), AVG(), MIN(), MAX(), etc. para calcular ciertos valores numéricos asociados a cada 
+    agrupación, mostrando así en la tabla del resultado, mínimo dos columnas, en la primera se indica el valor de la columna o 
+    columnas indicadas en el comando GROUP BY y en la segunda se coloca el resultado del cálculo realizado para cada valor de 
+    la primera columna.
+  - ORDER BY: Comando opcional cuya función es la de ordenar una agrupación de datos para observar de mejor manera su 
+    resultado, cuando se busca que este orden se ejecute de forma ascendente (de menos a más viéndolos de arriba hacia abajo 
+    en función del valor de cierto atributo) se incluye la sentencia ASC y cuando se quiere que se ordenen de forma 
+    descendente (de más a menos) se añade la sentencia DESC.*/
+--No se puede hacer esto: Porque se obtendrá el máximo de toda la tabla y se asignará a cada columna.
+SELECT carrera_id, fecha_incorporacion
+FROM ejercicios.alumnos
+GROUP BY carrera_id, fecha_incorporacion
+ORDER BY carrera_id DESC;
+--Se debe hacer esto: Para que se obtenga el máximo de cada agrupación (cada fila).
+SELECT carrera_id, MAX(fecha_incorporacion)
+FROM ejercicios.alumnos
+GROUP BY carrera_id
+ORDER BY carrera_id DESC;
+/*10.	Realiza una consulta SQL que acomode sus filas en orden alfabético y numéricamente a través de las 2 columnas con valores 
+de tipos diferentes tutor_id (tipo de dato numérico) y nombre (tipo de dato string) pertenecientes a la tabla alumnos. Para 
+ello en pgAdmin se selecciona la opción de: Tools → Query Tool.*/
+--No se puede hacer esto: Porque se obtendrá el máximo de toda la tabla y se asignará a cada columna.
+SELECT tutor_id, nombre
+FROM ejercicios.alumnos
+GROUP BY tutor_id, nombre
+ORDER BY tutor_id DESC;
+--Se debe hacer esto: Para que se obtenga el máximo de cada agrupación (cada fila).
+SELECT tutor_id, MIN(nombre)
+FROM ejercicios.alumnos
+GROUP BY tutor_id
+ORDER BY tutor_id DESC;
+
+
+
+
+
+/*11.	Realiza una consulta SQL que obtenga y acomode sus filas a través de los valores máximos de 2 columnas con valores de 
+tipos diferentes carrera_id (tipo de dato numérico) y fecha_incorporacion (tipo de dato date) pertenecientes a la tabla 
+alumnos. Para ello en pgAdmin se selecciona la opción de: Tools → Query Tool.*/
