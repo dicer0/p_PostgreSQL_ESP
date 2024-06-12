@@ -595,6 +595,79 @@ ORDER BY tutor_id DESC;
 
 
 
-/*11.	Realiza una consulta SQL que obtenga y acomode sus filas a través de los valores máximos de 2 columnas con valores de 
-tipos diferentes carrera_id (tipo de dato numérico) y fecha_incorporacion (tipo de dato date) pertenecientes a la tabla 
-alumnos. Para ello en pgAdmin se selecciona la opción de: Tools → Query Tool.*/
+/*11.	Realiza una consulta SQL que analice el caso donde un alumno se encuentre dando tutorías a otros alumnos dentro de una 
+misma clase, obteniendo así el nombre y apellido del alumno que tome cada tutoría y el nombre y apellido de su alumno tutor. 
+Para ello en pgAdmin se selecciona la opción de: Tools → Query Tool.
+  - SELECT: Comando que indica las columnas de datos que se quiere extraer y mostrar.
+  - CONCAT(): Comando opcional que se utiliza para concatenar o unir valores variables extraídos de las columnas de una tabla 
+    con strings específicos para mostrar la información con cierto formato.
+  - FROM: Comando que indica la tabla de donde se tomarán los datos.
+  - JOIN: A través de la sentencia FROM se indica de qué tabla se extraerán los datos, de una consulta, pero este comando solo 
+    sirve cuando esto se realiza para una sola entidad, por lo que cuando se quiera extraer filas de datos de dos o más tablas 
+    distintas, se añade la instrucción JOIN. Es muy importante mencionar que esto solo se podrá realizar en aquellas entidades 
+    que se encuentren enlazadas a través de una relación, osea cuando una contenga una PRIMARY KEY y la otra posea una FOREIGN 
+    KEY (o las dos posean FOREIGN KEYS si tienen cardinalidad N:N).
+    - Los self JOINs se utilizan para poder realizar operaciones JOIN a través de diferentes instancias o copias de una misma 
+      tabla, en vez de hacerlo con más de una entidad, logrando así obtener la intersección, unión, etc. de sus columnas. Para 
+      ello se debe asignar un alias a cada instancia con el comando AS y a través de dichos alias se realizan las operaciones 
+      lógicas de los Diagramas de Venn, según el resultado que se quiera obtener con el comando ON y las columnas que se busque 
+      relacionar entre las copias de la tabla.
+  - ON: Este comando se utiliza en una instrucción JOIN para especificar la condición de unión entre las tablas que se están 
+    combinando, describiendo así cómo las filas de una tabla se relacionan con las filas de otra tabla en función de los 
+    valores de una o más columnas comunes.
+Los Self JOINs son utilizados cuando existan casos donde los datos de una tabla se reutilicen, como en este caso donde una 
+instancia de la clase alumno, puede tener asignado un id_tutor y a su vez la otra instancia está relacionada con esa primera.*/
+--Consulta self JOIN sin concatenación de los valores de sus columnas:
+SELECT 	alumno.nombre,
+		    alumno.apellido,
+        tutor.nombre,
+        tutor.apellido
+FROM 	  ejercicios.alumnos AS alumno
+	INNER JOIN	ejercicios.alumnos AS tutor ON alumno.tutor_id = tutor.id;
+--Consulta self JOIN con concatenación de los valores de sus columnas:
+SELECT 	CONCAT(alumno.nombre, ' ', alumno.apellido) AS nombre_alumno,
+        CONCAT(tutor.nombre, ' ', tutor.apellido) AS nombre_tutor
+FROM 	  ejercicios.alumnos AS alumno
+	INNER JOIN	ejercicios.alumnos AS tutor ON alumno.tutor_id = tutor.id;
+/*12.	Realiza una consulta SQL que analice el caso donde un alumno se encuentre dando tutorías a otros alumnos dentro de una 
+misma clase, obteniendo primero el nombre y apellido del alumno tutor y luego el número de alumnos a los que enseña, ordenando 
+su resultado de mayor a menor y mostrando el top 10 de alumnos tutores. Para ello en pgAdmin se selecciona la opción de: 
+Tools → Query Tool.
+  - COUNT(): Método que cuando se utiliza, siempre se debe poner después del método SELECT; este recibe como parámetro un 
+    atributo de los datos pertenecientes a la tabla y retorna el número de filas de datos que pertenecen a dicha columna.
+  - GROUP BY: Esta sentencia agrupa las filas resultantes de una consulta según uno o más atributos especificados. Se utiliza 
+    junto los métodos COUNT(), SUM(), AVG(), MIN(), MAX(), etc. para calcular ciertos valores numéricos asociados a cada 
+    agrupación, mostrando así en la tabla del resultado, mínimo dos columnas, en la primera se indica el valor de la columna o 
+    columnas indicadas en el comando GROUP BY y en la segunda se coloca el resultado del cálculo realizado para cada valor de 
+    la primera columna.
+  - ORDER BY: Comando opcional cuya función es la de ordenar una agrupación de datos para observar de mejor manera su 
+    resultado, cuando se busca que este orden se ejecute de forma ascendente (de menos a más viéndolos de arriba hacia abajo 
+    en función del valor de cierto atributo) se incluye la sentencia ASC y cuando se quiere que se ordenen de forma 
+    descendente (de más a menos) se añade la sentencia DESC.
+  - LIMIT: Este comando sirve para limitar el número de filas que se van a obtener a través de una consulta. Aunque se suele 
+    utilizar después del comando ORDER BY, se puede usar cuando sea.*/
+--Consulta self JOIN con concatenación de los valores de sus columnas, ordenamiento de mayor a menor y mostrando solo 10 datos:
+SELECT 	  CONCAT(tutor.nombre, ' ', tutor.apellido) AS nombre_tutor,
+          COUNT(*) AS alumnos_por_tutor
+FROM 	    ejercicios.alumnos AS alumno
+	INNER JOIN	ejercicios.alumnos AS tutor ON alumno.tutor_id = tutor.id
+GROUP BY  nombre_tutor
+ORDER BY  alumnos_por_tutor DESC
+LIMIT     10;
+/*13.	Realiza una consulta SQL que analice el caso donde un alumno se encuentre dando tutorías a otros alumnos dentro de una 
+misma clase, obteniendo el promedio de alumnos que tienen todas las filas de alumnos tutores. Para ello en pgAdmin se 
+selecciona la opción de: Tools → Query Tool.*/
+/*Consultas Anidadas: Se denotan por encontrarse entre paréntesis después de un comando SQL y casi siempre forzosamente se les 
+debe asignar un alias a través del comando AS, pero hay que tener en cuenta que lo que retorne esta operación interna, será 
+utilizado por el comando exterior, por lo que las Nested Queries no están limitadas a un uso, sino a una infinidad, dependiendo 
+del comando exterior al que se aplique y la acción interna que sea descrita entre sus paréntesis.
+En este caso como se aplica al método FROM, solo se ejecutará una vez y sirve para crear una nueva tabla con un id agregado, 
+que a su vez particione los datos para excluir la columna id y así poder encontrar los duplicados.
+  - AVG(): Método que cuando se utiliza, siempre se debe poner después del método SELECT; este recibe como parámetro un 
+    atributo de los datos pertenecientes a la tabla y retorna el valor promedio de todas sus filas de datos.
+  - GROUP BY: Esta sentencia agrupa las filas resultantes de una consulta según uno o más atributos especificados. Se utiliza 
+    junto los métodos COUNT(), SUM(), AVG(), MIN(), MAX(), etc. para calcular ciertos valores numéricos asociados a cada 
+    agrupación, mostrando así en la tabla del resultado, mínimo dos columnas, en la primera se indica el valor de la columna o 
+    columnas indicadas en el comando GROUP BY y en la segunda se coloca el resultado del cálculo realizado para cada valor de 
+    la primera columna.*/
+--Consulta self JOIN con concatenación de los valores de sus columnas, ordenamiento de mayor a menor y mostrando solo 10 datos:
