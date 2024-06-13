@@ -670,4 +670,133 @@ que a su vez particione los datos para excluir la columna id y así poder encont
     agrupación, mostrando así en la tabla del resultado, mínimo dos columnas, en la primera se indica el valor de la columna o 
     columnas indicadas en el comando GROUP BY y en la segunda se coloca el resultado del cálculo realizado para cada valor de 
     la primera columna.*/
---Consulta self JOIN con concatenación de los valores de sus columnas, ordenamiento de mayor a menor y mostrando solo 10 datos:
+--Consulta self JOIN, agrupamiento de datos por medio del nombre del alumno tutor, mostrando el promedio de alumnos:
+SELECT  AVG(alumnos_por_tutor) AS promedio_alumnos_por_tutor
+FROM    (
+  SELECT 	  tutor.nombre AS nombre_tutor,
+            COUNT(*) AS alumnos_por_tutor
+  FROM 	    ejercicios.alumnos AS alumno
+    INNER JOIN	ejercicios.alumnos AS tutor ON alumno.tutor_id = tutor.id
+  GROUP BY  nombre_tutor
+) AS alumnos_tutor;
+
+
+
+
+
+/*14.	Realiza una consulta SQL donde, después de haber eliminado ciertas profesiones en una escuela, averigüemos cuáles alumnos 
+se han quedado sin ninguna carrera asignada. Para ello se analiza el caso donde se tengan dos tablas distintas, una de alumnos 
+y otra de carreras, estas no se encuentran previamente unidas, pero se pueden relacionar a través de la columna carrera_id de 
+la entidad alumnos y el atributo id de la entidad carreras. Para resolver el ejercicio se debe realizar una operación JOIN 
+entre ellas. Por lo cual, en pgAdmin se debe seleccionar la opción de: Tools → Query Tool.
+  a.	Para resolver el ejercicio primero debemos saber en la tabla alumnos cuáles son las carrera_id que existen y cuántos 
+      alumnos le corresponden a cada uno.
+  b.	Luego debemos saber cuál es la carrera_id que posee el mayor número de alumnos y cuál es la menor.
+  c.	Después debemos asegurarnos de que en la tabla carreras no existan los id de carrera del 30 al 40.
+  d.	Finalmente, debemos realizar una operación de Diferencia izquierda: A – B, donde A = alumnos y B = carreras, para saber 
+      así los alumnos que no tienen asignada ninguna carrera.
+Esto se puede resolver con una operación JOIN de diferencia, para la cual ya existe una forma estandarizada de aplicación:
+  -	LEFT JOIN: Diferencia izquierda: A – B.
+    SELECT	Nombre_Atributo		FROM		Nombre_Tabla_Izq
+    LEFT JOIN  Nombre_Tabla_Der ON Tabla_Izq.PRIMARY_KEY = Tabla_Der.FOREIGN_KEY
+    WHERE		Tabla_Der.FOREIGN_KEY IS NULL;*/
+--Conteo de alumnos por carrera, agrupando las filas que pertenecen a cada id y ordenandolas por # de carrera de mayor a menor.
+SELECT 		carrera_id, COUNT(*) AS alumnos_por_carrera
+FROM		  ejercicios.alumnos
+GROUP BY	carrera_id
+ORDER BY	carrera_id DESC;
+--Conteo de alumnos por carrera, agrupando las filas que pertenecen a cada id y ordenandolas por # de alumnos de mayor a menor.
+SELECT 		carrera_id, COUNT(*) AS alumnos_por_carrera
+FROM		  ejercicios.alumnos
+GROUP BY	carrera_id
+ORDER BY	alumnos_por_carrera DESC;
+--Eliminación de las carreras con id de 30 a 40 de la tabla carreras, para posteriormente poder hacer una diferencia A-B.
+DELETE 	FROM ejercicios.carreras
+WHERE 	id BETWEEN 30 AND 40;
+--Diagrama de Venn de Diferencia A-B = alumnos-carreras
+SELECT 	  CONCAT(A.nombre, ' ', A.apellido),
+          A.carrera_id,
+          B.id,
+          B.carrera
+FROM	    ejercicios.alumnos AS A
+	LEFT JOIN ejercicios.carreras AS B
+	ON      A.carrera_id = B.id
+WHERE 		B.id IS NULL
+ORDER BY	A.carrera_id;
+/*15.	En el ejercicio anterior se realizó la operación de Diferencia izquierda: A – B, con una variante del comando JOIN, donde 
+A = alumnos y B = carreras, ahora realiza las operaciones faltantes de Intersección: A ∩ B, Unión: A U B, Diferencia e 
+intersección izquierda: A – B + (A∩B), Diferencia e intersección derecha: B – A + (A∩B), Diferencia derecha: B – A y Diferencia 
+simétrica: AUB-(A∩B). Para ello todos los siguientes códigos son equivalentes y en pgAdmin se ejecutan al seleccionar la opción 
+de: Tools → Query Tool.*/
+--Diagrama de Venn de Diferencia izquierda A-B = alumnos-carreras
+SELECT 	  	CONCAT(A.nombre, ' ', A.apellido),
+          	A.carrera_id,
+          	B.id,
+          	B.carrera
+FROM	      ejercicios.alumnos AS A
+	LEFT JOIN ejercicios.carreras AS B
+	ON        A.carrera_id = B.id
+WHERE 		  B.id IS NULL
+ORDER BY	  A.carrera_id DESC;
+--Diagrama de Venn de Diferencia e intersección izquierda: A – B + (A∩B)
+SELECT 	  	CONCAT(A.nombre, ' ', A.apellido),
+          	A.carrera_id,
+          	B.id,
+          	B.carrera
+FROM	      ejercicios.alumnos AS A
+	LEFT JOIN ejercicios.carreras AS B
+	ON        A.carrera_id = B.id
+ORDER BY	  A.carrera_id DESC;
+--Diagrama de Venn de Unión AUB = alumnos U carreras
+SELECT 	  	CONCAT(A.nombre, ' ', A.apellido),
+          	A.carrera_id,
+          	B.id,
+          	B.carrera
+FROM	      ejercicios.alumnos AS A
+	FULL OUTER JOIN ejercicios.carreras AS B
+	ON        A.carrera_id = B.id
+ORDER BY	  A.carrera_id DESC;
+--Diagrama de Venn de Diferencia derecha B-A = carreras-alumnos
+SELECT 	  	CONCAT(A.nombre, ' ', A.apellido),
+          	A.carrera_id,
+          	B.id,
+          	B.carrera
+FROM	      ejercicios.alumnos AS A
+	RIGHT JOIN ejercicios.carreras AS B
+	ON        A.carrera_id = B.id
+WHERE 		  A.carrera_id IS NULL
+ORDER BY	  B.id DESC;
+--Diagrama de Venn de Diferencia e intersección derecha: B – A + (A∩B)
+SELECT 	  	CONCAT(A.nombre, ' ', A.apellido),
+          	A.carrera_id,
+          	B.id,
+          	B.carrera
+FROM	      ejercicios.alumnos AS A
+	RIGHT JOIN ejercicios.carreras AS B
+	ON        A.carrera_id = B.id
+ORDER BY	  A.carrera_id DESC;
+--Diagrama de Venn de Intersección: A∩B
+SELECT 	  	CONCAT(A.nombre, ' ', A.apellido),
+          	A.carrera_id,
+          	B.id,
+          	B.carrera
+FROM	      ejercicios.alumnos AS A
+	INNER JOIN ejercicios.carreras AS B
+	ON        A.carrera_id = B.id
+ORDER BY	  A.carrera_id DESC;
+--Diagrama de Venn de Diferencia simétrica: AUB-(A∩B)
+SELECT 	  	CONCAT(A.nombre, ' ', A.apellido),
+          	A.carrera_id,
+          	B.id,
+          	B.carrera
+FROM	      ejercicios.alumnos AS A
+	FULL OUTER JOIN ejercicios.carreras AS B
+	ON        A.carrera_id = B.id
+WHERE 		  A.carrera_id IS NULL
+		OR 	    B.id IS NULL
+ORDER BY	  B.id DESC;
+
+
+
+
+/*16.*/
