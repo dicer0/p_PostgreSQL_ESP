@@ -799,4 +799,46 @@ ORDER BY	  B.id DESC;
 
 
 
-/*16.*/
+
+/*16.	Realiza una consulta SQL que genere triángulos a través de varios métodos recursivo (que se ejecuten varias veces). Para 
+ello en pgAdmin se selecciona la opción de: Tools → Query Tool.
+  - lpad('string_base', numLetras, 'caracteres_de_relleno'): Método que siempre se coloca a la izquierda de la función SELECT, 
+    la cual sirve para declarar un string de cierto número de letras estático, para ello recibe los siguientes parámetros:
+      - 'string_base': Indica el string base que se colocará hasta la derecha del string total.
+      - numLetras: Es un número entero que indica el número de letras totales del string.
+          - Dentro de este parámetro se puede colocar el nombre de alguna columna numérica de la tabla utilizada en el Query y 
+            esto logrará que se muestre el número de letras correspondiente a cada fila de dicha columna de forma cíclica, 
+            logrando crear así triángulos.
+          - WHERE: Si el método lpad() se utiliza junto al comando WHERE, la columna indicada en este parámetro se tomará como 
+            una variable numérica y con este comando se limitará el número ejecuciones del método lpad() a través de cierta 
+            condición matemática (=, >, <, etc.).
+      - 'caracteres_de_relleno': Parámetro que indica el caracter que se colocará en los espacios vacíos que deban rellenarse 
+        en la parte izquierda del string.
+  - rpad('string_base', numLetras, 'caracteres_de_relleno'): Método que realiza la misma función del método lpad, pero en vez 
+    de colocar su string base hasta la izquierda, lo coloca hasta la derecha.  
+  - FROM: Comando que indica la tabla de donde se tomarán los datos.
+  - CAST(variable   AS  tipo_de_dato): Comando que transforma el tipo de dato de una variable a otro, el cual está indicado
+    después del comando AS.
+  - AS: Es una instrucción opcional que se puede utilizar en conjunto con el comando SELECT, FROM o JOIN, la cual sirve para 
+    cambiar el nombre de la columna de datos extraída y asignarle un alias o nombre de variable, cambiando solo la forma en 
+    la que se representan los datos extraídos, no su nombre en la base de datos.*/
+--Método lpad() estático:
+SELECT 	lpad('di_cer0', 20, 'x');
+--Método lpad() recursivo con columna numérica y limitado por el comando WHERE:
+SELECT 	lpad('di_cer0', id, '/')
+FROM	  ejercicios.alumnos
+WHERE 	id <= 12;
+--Método lpad() recursivo con columna numérica generada por una subconsulta y reformateada con el comando CAST():
+SELECT 	lpad('*', CAST(num_subconsulta AS int), '*')
+FROM (
+	SELECT 	ROW_NUMBER() OVER() AS num_subconsulta, *
+	FROM 	ejercicios.alumnos
+) AS    columna_numerica_subquery
+WHERE 	id <= 7;
+
+
+
+
+
+/*17.	Realiza una consulta SQL que genere triángulos a través de varios métodos recursivo (que se ejecuten varias veces). Para 
+ello en pgAdmin se selecciona la opción de: Tools → Query Tool.*/
