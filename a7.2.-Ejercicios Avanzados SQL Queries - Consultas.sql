@@ -815,7 +815,7 @@ ello en pgAdmin se selecciona la opción de: Tools → Query Tool.
       - 'caracteres_de_relleno': Parámetro que indica el caracter que se colocará en los espacios vacíos que deban rellenarse 
         en la parte izquierda del string.
   - rpad('string_base', numLetras, 'caracteres_de_relleno'): Método que realiza la misma función del método lpad, pero en vez 
-    de colocar su string base hasta la izquierda, lo coloca hasta la derecha.  
+    de colocar su string base hasta la izquierda, lo coloca hasta la derecha.
   - FROM: Comando que indica la tabla de donde se tomarán los datos.
   - CAST(variable   AS  tipo_de_dato): Comando que transforma el tipo de dato de una variable a otro, el cual está indicado
     después del comando AS.
@@ -840,5 +840,93 @@ WHERE 	id <= 7;
 
 
 
-/*17.	Realiza una consulta SQL que genere triángulos a través de varios métodos recursivo (que se ejecuten varias veces). Para 
-ello en pgAdmin se selecciona la opción de: Tools → Query Tool.*/
+/*17.	Realiza una consulta SQL que genere una serie de números consecutivos (un rango) a través del método generate_series(). 
+Para ello en pgAdmin se selecciona la opción de: Tools → Query Tool.
+  - generate_series(numInicio, numFinal, paso): Método para generar una serie de números consecutivos (un rango), que recibe 
+    los siguientes parámetros:
+      - numInicio: Indica el número inicial del rango.
+      - numFinal: Indica el número final del rango.
+      - paso: Es el número con el cuál aumenta o decrece el valor de los números consecutivos dentro del rango. 
+          - Si no se indica ningún paso, este por default será de 1.
+          - Se puede crear un rango decreciente solamente cuando se indique explícitamente en el tercer parámetro un paso 
+            negativo, sino no se nos permitirá crear dicho rango.
+          - WITH ordinality: Esta instrucción opcional agrega un índice que cuenta desde 1 todas las filas de la tabla creada
+            por el rango creado.
+  - current_date: Método para obtener la fecha actual del sistema en el formato YYYY-MM-DD.
+  - AS: Es una instrucción opcional que se puede utilizar en conjunto con el comando SELECT, FROM o JOIN, la cual sirve para 
+    cambiar el nombre de la columna de datos extraída y asignarle un alias o nombre de variable, cambiando solo la forma en 
+    la que se representan los datos extraídos, no su nombre en la base de datos.
+  - Cast(::): Un Cast se refiere a la transformación de un tipo de dato en otro distinto y su sintaxis es alguna de las 
+    siguientes: 
+        tabla.columna::nuevo_tipo_de_dato
+        (tabla.columna_1,…, tabla.columna_n)::nuevo_tipo_de_dato
+  - FROM: Comando que indica la tabla de donde se tomarán los datos.
+  - ORDER BY: Comando opcional cuya función es la de ordenar una agrupación de datos para observar de mejor manera su 
+    resultado, cuando se busca que este orden se ejecute de forma ascendente (de menos a más viéndolos de arriba hacia abajo 
+    en función del valor de cierto atributo) se incluye la sentencia ASC y cuando se quiere que se ordenen de forma 
+    descendente (de más a menos) se añade la sentencia DESC.
+  - lpad('string_base', numLetras, 'caracteres_de_relleno'): Método que siempre se coloca a la izquierda de la función SELECT, 
+    la cual sirve para declarar un string de cierto número de letras estático, para ello recibe los siguientes parámetros:
+      - 'string_base': Indica el string base que se colocará hasta la derecha del string total.
+      - numLetras: Es un número entero que indica el número de letras totales del string.
+          - Dentro de este parámetro se puede colocar el nombre de alguna columna numérica de la tabla utilizada en el Query y 
+            esto logrará que se muestre el número de letras correspondiente a cada fila de dicha columna de forma cíclica, 
+            logrando crear así triángulos.
+          - WHERE: Si el método lpad() se utiliza junto al comando WHERE, la columna indicada en este parámetro se tomará como 
+            una variable numérica y con este comando se limitará el número ejecuciones del método lpad() a través de cierta 
+            condición matemática (=, >, <, etc.).
+      - 'caracteres_de_relleno': Parámetro que indica el caracter que se colocará en los espacios vacíos que deban rellenarse 
+        en la parte izquierda del string.
+  - rpad('string_base', numLetras, 'caracteres_de_relleno'): Método que realiza la misma función del método lpad, pero en vez 
+    de colocar su string base hasta la izquierda, lo coloca hasta la derecha.
+  - CAST(variable   AS  tipo_de_dato): Comando que transforma el tipo de dato de una variable a otro, el cual está indicado
+    después del comando AS.*/
+--Método generate_series() para generar rango numérico creciente sin paso indicado explícitamente:
+SELECT  *
+FROM    generate_series(1.1, 4);
+/*Método generate_series() para generar rango de tipo timestamp creciente con paso indicado explícitamente:
+  - timestamp: En este tipo de dato se pueden especificar partes de la fecha u hora a través de los strings: years, months, 
+    days, hours, minutes, seconds, quarters, dow (día de la semana), doy (día del año), etc.*/
+SELECT  *
+FROM    generate_series('2024-04-06 00:00:00'::timestamp, '2024-04-09 00:00:00', '10 hours');
+--Método generate_series() para generar rango numérico decreciente sin paso indicado explícitamente: Generará un arreglo vacío.
+SELECT  *
+FROM    generate_series(4, 3);
+--Método generate_series() para generar rango numérico decreciente con paso indicado explícitamente:
+SELECT  *
+FROM    generate_series(5, 1, -2);
+--Operación con un rango numérico creado por el método generate_series() y la fecha actual del sistema current_date:
+SELECT  current_date + tablaRango.numeros AS fechas_rango
+FROM    generate_series(0, 14, 7) AS tablaRango(numeros);
+--Operación JOIN de una tabla con un rango numérico creado por el método generate_series():
+SELECT    alumno.id,
+          CONCAT(alumno.nombre, ' ', alumno.apellido),
+          alumno.carrera_id,
+          tablaRango.numeros
+FROM      ejercicios.alumnos AS alumno
+  INNER JOIN generate_series(0, 10) AS tablaRango(numeros)
+  ON      tablaRango.numeros = alumno.carrera_id
+ORDER BY  alumno.carrera_id;
+--Generación de un rango numérico creado por el método generate_series() y su índice incluido con el comando WITH:
+SELECT  *
+FROM    generate_series(10, 2, -2) WITH ordinality;
+--Creación de triángulos con un rango numérico creado por el método generate_series() con índice incluid y el método lpad():
+SELECT  lpad('^', CAST(ordinality AS int), '*')
+FROM    generate_series(10, 2, -2) WITH ordinality;
+
+
+
+
+
+/*18.	Realiza una consulta SQL que a través de expresiones regulares analice si el contenido de una columna es o no un email. 
+Para ello en pgAdmin se selecciona la opción de: Tools → Query Tool.
+  - WHERE: Comando para indicar cuáles filas de la tabla queremos extraer, filtrando así la consulta a través de cierta 
+    condición matemática (=, >, <, etc.) aplicada a alguna columna de la tabla.*/
+--Consulta con expresiones regulares para encontrar cualquier email:
+SELECT  email
+FROM    ejercicios.alumnos
+WHERE   email ~*'[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}';
+--Consulta con expresiones regulares para encontrar una terminación de email específica:
+SELECT  email
+FROM    ejercicios.alumnos
+WHERE   email ~*'[A-Z0-9._%+-]+@google[A-Z0-9.-]+\.[A-Z]{2,4}';
